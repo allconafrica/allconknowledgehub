@@ -101,6 +101,12 @@
       border-color: #3A3A3E;
     }
 
+    .btn-admin-active {
+      border-color: var(--allcon-red);
+      color: var(--allcon-red);
+      box-shadow: 0 0 10px var(--allcon-red-glow);
+    }
+
     .btn-primary {
       background: var(--allcon-red);
       border-color: var(--allcon-red);
@@ -210,6 +216,7 @@
       transition: transform 0.2s ease, border-color 0.2s ease;
       display: flex;
       flex-direction: column;
+      position: relative;
     }
 
     .card:hover {
@@ -284,6 +291,31 @@
       color: var(--text-main);
       border-radius: 0 4px 4px 0;
       margin-top: auto;
+    }
+
+    /* DELETE BUTTON IN ADMIN MODE */
+    .delete-card-btn {
+      display: none;
+      position: absolute;
+      top: 10px;
+      right: 10px;
+      background: var(--allcon-red);
+      color: #fff;
+      border: none;
+      border-radius: 50%;
+      width: 28px;
+      height: 28px;
+      font-size: 1rem;
+      font-weight: bold;
+      cursor: pointer;
+      z-index: 10;
+      box-shadow: 0 0 10px rgba(0,0,0,0.5);
+    }
+
+    .admin-mode-active .delete-card-btn {
+      display: flex;
+      align-items: center;
+      justify-content: center;
     }
 
     /* MODAL FORM */
@@ -374,7 +406,7 @@
     }
   </style>
 </head>
-<body>
+<body id="body">
 
   <!-- HEADER -->
   <header>
@@ -383,7 +415,7 @@
       <div class="brand-title">ALLCON <span>KNOWLEDGE HUB</span></div>
     </div>
     <div class="nav-actions">
-      <button class="btn" onclick="window.location.href='/admin'">Pages CMS Admin</button>
+      <button class="btn" id="adminToggleBtn" onclick="toggleAdminMode()">Manage / Delete Mode</button>
       <button class="btn btn-primary" onclick="toggleModal()">+ Submit New Entry</button>
     </div>
   </header>
@@ -404,69 +436,11 @@
 
     <!-- DRAWING BREAKDOWNS -->
     <div class="section-title">Visual Drawing Guides & Breakdown</div>
-    <div class="grid" id="drawingsGrid">
-      
-      <!-- Card 1 -->
-      <div class="card" data-title="Flange Spec Tolerance Check">
-        <div class="drawing-preview">
-          <img src="https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80" alt="Technical Drawing">
-        </div>
-        <div class="card-body">
-          <span class="card-badge">Drawing Breakdown</span>
-          <h3 class="card-title">Flange Machining & Tolerance Requirements</h3>
-          <p class="card-desc">How to check face finish callouts and bolt-hole circle PCD tolerances before submitting PO.</p>
-          <div class="callout-box">
-            <strong>Critical Trap:</strong> Verify if ±0.005 tight tolerance on bore diameter requires fine-boring upcharge from vendor.
-          </div>
-        </div>
-      </div>
-
-      <!-- Card 2 -->
-      <div class="card" data-title="Structural Steel Coating Callout">
-        <div class="drawing-preview">
-          <img src="https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?auto=format&fit=crop&w=600&q=80" alt="Steel Spec">
-        </div>
-        <div class="card-body">
-          <span class="card-badge">Drawing Breakdown</span>
-          <h3 class="card-title">Structural Steel - Galvanizing & Paint Specs</h3>
-          <p class="card-desc">Identifying surface preparation standards (SSPC-SP10) buried in engineering revision block notes.</p>
-          <div class="callout-box">
-            <strong>Critical Trap:</strong> "Hot-Dip Galvanized" note on sheet 3 overrides general surface finish on sheet 1.
-          </div>
-        </div>
-      </div>
-
-    </div>
+    <div class="grid" id="drawingsGrid"></div>
 
     <!-- WORDED Q&A / SOP -->
     <div class="section-title">Direct Procurement Instructions & Q&A</div>
-    <div class="grid" id="qaGrid">
-
-      <!-- Card 3 -->
-      <div class="card" data-title="Material Test Report MTR Verification">
-        <div class="card-body">
-          <span class="card-badge">Q&A / SOP</span>
-          <h3 class="card-title">When is a 3.1 Material Certificate (MTR) Mandatory?</h3>
-          <p class="card-desc"><strong>Question:</strong> Can we issue a PO without requesting mill test certificates upfront?</p>
-          <div class="callout-box">
-            <strong>Rule:</strong> Never issue POs for pressure-retaining components without explicit 3.1 certification requirements on the PO line items.
-          </div>
-        </div>
-      </div>
-
-      <!-- Card 4 -->
-      <div class="card" data-title="Vendor Revision Control Verification">
-        <div class="card-body">
-          <span class="card-badge">Q&A / SOP</span>
-          <h3 class="card-title">How to handle Drawing Revision updates mid-quote</h3>
-          <p class="card-desc"><strong>Question:</strong> What happens if engineering updates the drawing rev while vendor is quoting?</p>
-          <div class="callout-box">
-            <strong>Rule:</strong> Re-issue the RFQ with the new Rev Letter in the email title. Ensure vendor re-quotes explicitly against the new Rev ID.
-          </div>
-        </div>
-      </div>
-
-    </div>
+    <div class="grid" id="qaGrid"></div>
 
   </main>
 
@@ -487,15 +461,19 @@
         </div>
         <div class="form-group">
           <label>Title / Component Description</label>
-          <input type="text" class="form-control" placeholder="e.g., Valve Flange Weld Prep Callout">
+          <input type="text" class="form-control" id="entryTitle" placeholder="e.g., Valve Flange Weld Prep Callout">
         </div>
         <div class="form-group">
-          <label>Screenshot / Drawing Image</label>
-          <input type="file" class="form-control" accept="image/*">
+          <label>Description / Question</label>
+          <input type="text" class="form-control" id="entryDesc" placeholder="Brief summary or question asked">
         </div>
         <div class="form-group">
-          <label>Detailed Instructions / Common Trap</label>
-          <textarea class="form-control" placeholder="What should the next buyer check before placing this PO? What went wrong last time?"></textarea>
+          <label>Screenshot / Drawing Image (Optional for Q&A)</label>
+          <input type="file" class="form-control" id="entryImage" accept="image/*">
+        </div>
+        <div class="form-group">
+          <label>Detailed Instructions / Critical Trap</label>
+          <textarea class="form-control" id="entryTrap" placeholder="What should the next buyer check before placing this PO?"></textarea>
         </div>
       </div>
       <div class="modal-footer">
@@ -506,9 +484,157 @@
   </div>
 
   <script>
+    // Initial Default Data
+    const defaultData = [
+      {
+        id: '1',
+        type: 'drawing',
+        title: 'Flange Machining & Tolerance Requirements',
+        desc: 'How to check face finish callouts and bolt-hole circle PCD tolerances before submitting PO.',
+        trap: 'Verify if ±0.005 tight tolerance on bore diameter requires fine-boring upcharge from vendor.',
+        img: 'https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80'
+      },
+      {
+        id: '2',
+        type: 'drawing',
+        title: 'Structural Steel - Galvanizing & Paint Specs',
+        desc: 'Identifying surface preparation standards (SSPC-SP10) buried in engineering revision block notes.',
+        trap: '"Hot-Dip Galvanized" note on sheet 3 overrides general surface finish on sheet 1.',
+        img: 'https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?auto=format&fit=crop&w=600&q=80'
+      },
+      {
+        id: '3',
+        type: 'qa',
+        title: 'When is a 3.1 Material Certificate (MTR) Mandatory?',
+        desc: 'Question: Can we issue a PO without requesting mill test certificates upfront?',
+        trap: 'Never issue POs for pressure-retaining components without explicit 3.1 certification requirements on the PO line items.',
+        img: ''
+      },
+      {
+        id: '4',
+        type: 'qa',
+        title: 'How to handle Drawing Revision updates mid-quote',
+        desc: 'Question: What happens if engineering updates the drawing rev while vendor is quoting?',
+        trap: 'Re-issue the RFQ with the new Rev Letter in the email title. Ensure vendor re-quotes explicitly against the new Rev ID.',
+        img: ''
+      }
+    ];
+
+    let hubData = JSON.parse(localStorage.getItem('allcon_hub_data')) || defaultData;
+    let adminMode = false;
+
+    function renderCards() {
+      const drawingsGrid = document.getElementById('drawingsGrid');
+      const qaGrid = document.getElementById('qaGrid');
+      
+      drawingsGrid.innerHTML = '';
+      qaGrid.innerHTML = '';
+
+      hubData.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'card';
+        card.setAttribute('data-title', item.title);
+
+        const imgHtml = item.img ? `
+          <div class="drawing-preview">
+            <img src="${item.img}" alt="${item.title}">
+          </div>` : '';
+
+        card.innerHTML = `
+          <button class="delete-card-btn" onclick="deleteEntry('${item.id}')">&times;</button>
+          ${imgHtml}
+          <div class="card-body">
+            <span class="card-badge">${item.type === 'drawing' ? 'Drawing Breakdown' : 'Q&A / SOP'}</span>
+            <h3 class="card-title">${item.title}</h3>
+            <p class="card-desc">${item.desc}</p>
+            <div class="callout-box">
+              <strong>${item.type === 'drawing' ? 'Critical Trap:' : 'Rule:'}</strong> ${item.trap}
+            </div>
+          </div>
+        `;
+
+        if (item.type === 'drawing') {
+          drawingsGrid.appendChild(card);
+        } else {
+          qaGrid.appendChild(card);
+        }
+      });
+    }
+
+    function toggleAdminMode() {
+      adminMode = !adminMode;
+      const body = document.getElementById('body');
+      const btn = document.getElementById('adminToggleBtn');
+      
+      if (adminMode) {
+        body.classList.add('admin-mode-active');
+        btn.classList.add('btn-admin-active');
+        btn.innerText = 'Exit Delete Mode';
+      } else {
+        body.classList.remove('admin-mode-active');
+        btn.classList.remove('btn-admin-active');
+        btn.innerText = 'Manage / Delete Mode';
+      }
+    }
+
+    function deleteEntry(id) {
+      if (confirm('Are you sure you want to delete this knowledge entry?')) {
+        hubData = hubData.filter(item => item.id !== id);
+        localStorage.setItem('allcon_hub_data', JSON.stringify(hubData));
+        renderCards();
+      }
+    }
+
     function toggleModal() {
       const modal = document.getElementById('submissionModal');
       modal.classList.toggle('active');
+    }
+
+    function saveEntry() {
+      const type = document.getElementById('entryType').value;
+      const title = document.getElementById('entryTitle').value;
+      const desc = document.getElementById('entryDesc').value;
+      const trap = document.getElementById('entryTrap').value;
+      const fileInput = document.getElementById('entryImage');
+
+      if (!title || !trap) {
+        alert('Please fill out at least the Title and Instructions/Trap.');
+        return;
+      }
+
+      const newEntry = {
+        id: Date.now().toString(),
+        type: type,
+        title: title,
+        desc: desc || '',
+        trap: trap,
+        img: ''
+      };
+
+      if (fileInput.files && fileInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          newEntry.img = e.target.result;
+          hubData.unshift(newEntry);
+          localStorage.setItem('allcon_hub_data', JSON.stringify(hubData));
+          renderCards();
+          clearFormAndClose();
+        };
+        reader.readAsDataURL(fileInput.files[0]);
+      } else {
+        hubData.unshift(newEntry);
+        localStorage.setItem('allcon_hub_data', JSON.stringify(hubData));
+        renderCards();
+        clearFormAndClose();
+      }
+    }
+
+    function clearFormAndClose() {
+      document.getElementById('entryTitle').value = '';
+      document.getElementById('entryDesc').value = '';
+      document.getElementById('entryTrap').value = '';
+      document.getElementById('entryImage').value = '';
+      toggleModal();
     }
 
     function filterCards() {
@@ -527,10 +653,8 @@
       });
     }
 
-    function saveEntry() {
-      alert("Entry submitted! (In production, this triggers your Pages CMS commit or Webhook pipeline).");
-      toggleModal();
-    }
+    // Initial render
+    renderCards();
   </script>
 </body>
 </html>
