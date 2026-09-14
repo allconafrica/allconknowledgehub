@@ -1,0 +1,536 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>ALLCON KNOWLEDGE HUB</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-black: #0B0B0C;
+      --bg-card: #141416;
+      --bg-card-hover: #1C1C1E;
+      --border-color: #26262A;
+      --allcon-red: #E50914;
+      --allcon-red-hover: #FF1F2D;
+      --allcon-red-glow: rgba(229, 9, 20, 0.25);
+      --text-main: #F2F2F3;
+      --text-muted: #8E8E93;
+      --text-subtle: #636366;
+      --font-sans: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      --font-mono: 'JetBrains Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg-black);
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* HEADER / NAVBAR */
+    header {
+      background: rgba(20, 20, 22, 0.8);
+      backdrop-filter: blur(12px);
+      border-bottom: 1px solid var(--border-color);
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      padding: 1rem 2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .brand {
+      display: flex;
+      align-items: center;
+      gap: 0.75rem;
+    }
+
+    .brand-accent {
+      width: 4px;
+      height: 24px;
+      background-color: var(--allcon-red);
+      box-shadow: 0 0 10px var(--allcon-red-glow);
+      border-radius: 2px;
+    }
+
+    .brand-title {
+      font-size: 1.1rem;
+      font-weight: 800;
+      letter-spacing: 0.08em;
+      color: var(--text-main);
+      text-transform: uppercase;
+    }
+
+    .brand-title span {
+      color: var(--allcon-red);
+    }
+
+    .nav-actions {
+      display: flex;
+      gap: 1rem;
+    }
+
+    /* BUTTONS */
+    .btn {
+      background: var(--bg-card);
+      color: var(--text-main);
+      border: 1px solid var(--border-color);
+      padding: 0.6rem 1.2rem;
+      border-radius: 6px;
+      font-weight: 600;
+      font-size: 0.85rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn:hover {
+      background: var(--bg-card-hover);
+      border-color: #3A3A3E;
+    }
+
+    .btn-primary {
+      background: var(--allcon-red);
+      border-color: var(--allcon-red);
+      color: #FFFFFF;
+      box-shadow: 0 0 15px var(--allcon-red-glow);
+    }
+
+    .btn-primary:hover {
+      background: var(--allcon-red-hover);
+      border-color: var(--allcon-red-hover);
+      box-shadow: 0 0 20px rgba(255, 31, 45, 0.4);
+    }
+
+    /* HERO & SEARCH BAR */
+    .hero {
+      padding: 3.5rem 2rem 2.5rem;
+      max-width: 1200px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .hero h1 {
+      font-size: 2.2rem;
+      font-weight: 800;
+      letter-spacing: -0.02em;
+      margin-bottom: 0.5rem;
+    }
+
+    .hero p {
+      color: var(--text-muted);
+      font-size: 1rem;
+      margin-bottom: 1.75rem;
+    }
+
+    .search-container {
+      position: relative;
+      max-width: 650px;
+    }
+
+    .search-input {
+      width: 100%;
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 8px;
+      padding: 0.9rem 1.2rem 0.9rem 3rem;
+      color: var(--text-main);
+      font-size: 0.95rem;
+      outline: none;
+      transition: all 0.2s ease;
+    }
+
+    .search-input:focus {
+      border-color: var(--allcon-red);
+      box-shadow: 0 0 0 3px var(--allcon-red-glow);
+    }
+
+    .search-icon {
+      position: absolute;
+      left: 1.1rem;
+      top: 50%;
+      transform: translateY(-50%);
+      color: var(--text-subtle);
+      pointer-events: none;
+    }
+
+    /* MAIN CONTAINER */
+    .main-container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 0 2rem 4rem;
+      width: 100%;
+      flex-grow: 1;
+    }
+
+    .section-title {
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-transform: uppercase;
+      letter-spacing: 0.1em;
+      color: var(--text-muted);
+      margin-bottom: 1.25rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .section-title::after {
+      content: '';
+      flex-grow: 1;
+      height: 1px;
+      background: var(--border-color);
+    }
+
+    /* DASHBOARD GRID */
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 3rem;
+    }
+
+    .card {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 10px;
+      overflow: hidden;
+      transition: transform 0.2s ease, border-color 0.2s ease;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card:hover {
+      transform: translateY(-3px);
+      border-color: #3A3A3E;
+    }
+
+    .card-badge {
+      display: inline-block;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      text-transform: uppercase;
+      padding: 0.25rem 0.5rem;
+      border-radius: 4px;
+      background: rgba(229, 9, 20, 0.12);
+      color: var(--allcon-red);
+      border: 1px solid rgba(229, 9, 20, 0.2);
+      align-self: flex-start;
+      margin-bottom: 0.75rem;
+    }
+
+    .card-body {
+      padding: 1.25rem;
+      flex-grow: 1;
+      display: flex;
+      flex-direction: column;
+    }
+
+    .card-title {
+      font-size: 1.1rem;
+      font-weight: 700;
+      margin-bottom: 0.5rem;
+      line-height: 1.3;
+    }
+
+    .card-desc {
+      color: var(--text-muted);
+      font-size: 0.875rem;
+      line-height: 1.5;
+      margin-bottom: 1rem;
+    }
+
+    .drawing-preview {
+      width: 100%;
+      height: 180px;
+      background-color: #000;
+      border-bottom: 1px solid var(--border-color);
+      position: relative;
+      overflow: hidden;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .drawing-preview img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.85;
+      transition: opacity 0.2s ease;
+    }
+
+    .card:hover .drawing-preview img {
+      opacity: 1;
+    }
+
+    .callout-box {
+      background: rgba(229, 9, 20, 0.05);
+      border-left: 3px solid var(--allcon-red);
+      padding: 0.75rem;
+      font-size: 0.825rem;
+      color: var(--text-main);
+      border-radius: 0 4px 4px 0;
+      margin-top: auto;
+    }
+
+    /* MODAL FORM */
+    .modal-overlay {
+      position: fixed;
+      top: 0; left: 0; right: 0; bottom: 0;
+      background: rgba(0, 0, 0, 0.85);
+      backdrop-filter: blur(8px);
+      display: none;
+      align-items: center;
+      justify-content: center;
+      z-index: 200;
+      padding: 1rem;
+    }
+
+    .modal-overlay.active { display: flex; }
+
+    .modal {
+      background: var(--bg-card);
+      border: 1px solid var(--border-color);
+      border-radius: 12px;
+      width: 100%;
+      max-width: 600px;
+      overflow: hidden;
+      box-shadow: 0 20px 40px rgba(0,0,0,0.8);
+    }
+
+    .modal-header {
+      padding: 1.25rem 1.5rem;
+      border-bottom: 1px solid var(--border-color);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .modal-header h3 {
+      font-size: 1.1rem;
+      font-weight: 700;
+    }
+
+    .close-btn {
+      background: none;
+      border: none;
+      color: var(--text-muted);
+      font-size: 1.5rem;
+      cursor: pointer;
+    }
+
+    .modal-body { padding: 1.5rem; }
+
+    .form-group { margin-bottom: 1.25rem; }
+
+    .form-group label {
+      display: block;
+      font-size: 0.8rem;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      color: var(--text-muted);
+      margin-bottom: 0.4rem;
+    }
+
+    .form-control {
+      width: 100%;
+      background: var(--bg-black);
+      border: 1px solid var(--border-color);
+      border-radius: 6px;
+      padding: 0.75rem;
+      color: var(--text-main);
+      font-family: var(--font-sans);
+      font-size: 0.9rem;
+      outline: none;
+    }
+
+    .form-control:focus {
+      border-color: var(--allcon-red);
+    }
+
+    textarea.form-control { resize: vertical; min-height: 90px; }
+
+    .modal-footer {
+      padding: 1rem 1.5rem;
+      border-top: 1px solid var(--border-color);
+      display: flex;
+      justify-content: flex-end;
+      gap: 0.75rem;
+      background: rgba(0,0,0,0.2);
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="brand">
+      <div class="brand-accent"></div>
+      <div class="brand-title">ALLCON <span>KNOWLEDGE HUB</span></div>
+    </div>
+    <div class="nav-actions">
+      <button class="btn" onclick="window.location.href='/admin'">Pages CMS Admin</button>
+      <button class="btn btn-primary" onclick="toggleModal()">+ Submit New Entry</button>
+    </div>
+  </header>
+
+  <!-- HERO & SEARCH -->
+  <div class="hero">
+    <h1>Technical Buyer Verification Standard</h1>
+    <p>Internal repository for drawing callouts, purchasing rules, and critical SOP checklists.</p>
+    
+    <div class="search-container">
+      <svg class="search-icon" width="18" height="18" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 7 0 11-14 0 7 7 0 0114 0z"></path></svg>
+      <input type="text" id="searchInput" class="search-input" placeholder="Search by part name, standard specification, or keyword..." onkeyup="filterCards()">
+    </div>
+  </div>
+
+  <!-- MAIN CONTENT -->
+  <main class="main-container">
+
+    <!-- DRAWING BREAKDOWNS -->
+    <div class="section-title">Visual Drawing Guides & Breakdown</div>
+    <div class="grid" id="drawingsGrid">
+      
+      <!-- Card 1 -->
+      <div class="card" data-title="Flange Spec Tolerance Check">
+        <div class="drawing-preview">
+          <img src="https://images.unsplash.com/photo-1581092160607-ee22621dd758?auto=format&fit=crop&w=600&q=80" alt="Technical Drawing">
+        </div>
+        <div class="card-body">
+          <span class="card-badge">Drawing Breakdown</span>
+          <h3 class="card-title">Flange Machining & Tolerance Requirements</h3>
+          <p class="card-desc">How to check face finish callouts and bolt-hole circle PCD tolerances before submitting PO.</p>
+          <div class="callout-box">
+            <strong>Critical Trap:</strong> Verify if ±0.005 tight tolerance on bore diameter requires fine-boring upcharge from vendor.
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 2 -->
+      <div class="card" data-title="Structural Steel Coating Callout">
+        <div class="drawing-preview">
+          <img src="https://images.unsplash.com/photo-1504917595217-d4dc5ebe6122?auto=format&fit=crop&w=600&q=80" alt="Steel Spec">
+        </div>
+        <div class="card-body">
+          <span class="card-badge">Drawing Breakdown</span>
+          <h3 class="card-title">Structural Steel - Galvanizing & Paint Specs</h3>
+          <p class="card-desc">Identifying surface preparation standards (SSPC-SP10) buried in engineering revision block notes.</p>
+          <div class="callout-box">
+            <strong>Critical Trap:</strong> "Hot-Dip Galvanized" note on sheet 3 overrides general surface finish on sheet 1.
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+    <!-- WORDED Q&A / SOP -->
+    <div class="section-title">Direct Procurement Instructions & Q&A</div>
+    <div class="grid" id="qaGrid">
+
+      <!-- Card 3 -->
+      <div class="card" data-title="Material Test Report MTR Verification">
+        <div class="card-body">
+          <span class="card-badge">Q&A / SOP</span>
+          <h3 class="card-title">When is a 3.1 Material Certificate (MTR) Mandatory?</h3>
+          <p class="card-desc"><strong>Question:</strong> Can we issue a PO without requesting mill test certificates upfront?</p>
+          <div class="callout-box">
+            <strong>Rule:</strong> Never issue POs for pressure-retaining components without explicit 3.1 certification requirements on the PO line items.
+          </div>
+        </div>
+      </div>
+
+      <!-- Card 4 -->
+      <div class="card" data-title="Vendor Revision Control Verification">
+        <div class="card-body">
+          <span class="card-badge">Q&A / SOP</span>
+          <h3 class="card-title">How to handle Drawing Revision updates mid-quote</h3>
+          <p class="card-desc"><strong>Question:</strong> What happens if engineering updates the drawing rev while vendor is quoting?</p>
+          <div class="callout-box">
+            <strong>Rule:</strong> Re-issue the RFQ with the new Rev Letter in the email title. Ensure vendor re-quotes explicitly against the new Rev ID.
+          </div>
+        </div>
+      </div>
+
+    </div>
+
+  </main>
+
+  <!-- SUBMISSION MODAL FORM -->
+  <div class="modal-overlay" id="submissionModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Submit New Knowledge Base Entry</h3>
+        <button class="close-btn" onclick="toggleModal()">&times;</button>
+      </div>
+      <div class="modal-body">
+        <div class="form-group">
+          <label>Entry Type</label>
+          <select class="form-control" id="entryType">
+            <option value="drawing">Drawing Breakdown (Visual)</option>
+            <option value="qa">Procurement Q&A / SOP</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Title / Component Description</label>
+          <input type="text" class="form-control" placeholder="e.g., Valve Flange Weld Prep Callout">
+        </div>
+        <div class="form-group">
+          <label>Screenshot / Drawing Image</label>
+          <input type="file" class="form-control" accept="image/*">
+        </div>
+        <div class="form-group">
+          <label>Detailed Instructions / Common Trap</label>
+          <textarea class="form-control" placeholder="What should the next buyer check before placing this PO? What went wrong last time?"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <button class="btn" onclick="toggleModal()">Cancel</button>
+        <button class="btn btn-primary" onclick="saveEntry()">Submit Entry</button>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    function toggleModal() {
+      const modal = document.getElementById('submissionModal');
+      modal.classList.toggle('active');
+    }
+
+    function filterCards() {
+      const input = document.getElementById('searchInput').value.toLowerCase();
+      const cards = document.querySelectorAll('.card');
+
+      cards.forEach(card => {
+        const title = card.getAttribute('data-title').toLowerCase();
+        const content = card.textContent.toLowerCase();
+        
+        if (title.includes(input) || content.includes(input)) {
+          card.style.display = "flex";
+        } else {
+          card.style.display = "none";
+        }
+      });
+    }
+
+    function saveEntry() {
+      alert("Entry submitted! (In production, this triggers your Pages CMS commit or Webhook pipeline).");
+      toggleModal();
+    }
+  </script>
+</body>
+</html>
