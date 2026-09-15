@@ -5,9 +5,9 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
   <title>ALLCON KNOWLEDGE HUB</title>
 
-  <!-- FAVICON TAG -->
+  <!-- FAVICON: Red Open Book -->
   <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'><rect width='64' height='64' rx='14' fill='%230B0B0C'/><path d='M12 20C12 17.7909 13.7909 16 16 16H30V48H16C13.7909 48 12 46.2091 12 44V20Z' fill='%23E50914'/><path d='M52 20C52 17.7909 50.2091 16 48 16H34V48H48C50.2091 48 52 46.2091 52 44V20Z' fill='%23FF1F2D'/><path d='M32 16V48' stroke='%230B0B0C' stroke-width='3'/></svg>">
-  
+
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -443,6 +443,7 @@
       border-radius: 0 6px 6px 0;
       font-size: 0.95rem;
       line-height: 1.6;
+      white-space: pre-wrap;
     }
 
     .form-group { margin-bottom: 1.25rem; }
@@ -482,6 +483,11 @@
       justify-content: space-between;
       align-items: center;
       background: rgba(0,0,0,0.2);
+    }
+
+    .modal-footer-left {
+      display: flex;
+      gap: 0.5rem;
     }
 
     .modal-footer-right {
@@ -550,7 +556,10 @@
         </div>
       </div>
       <div class="modal-footer">
-        <button class="btn btn-danger" id="detailDeleteBtn" onclick="">Delete Entry</button>
+        <div class="modal-footer-left">
+          <button class="btn" id="detailEditBtn" onclick="">✏️ Edit Entry</button>
+          <button class="btn btn-danger" id="detailDeleteBtn" onclick="">Delete Entry</button>
+        </div>
         <div class="modal-footer-right">
           <button class="btn" onclick="toggleModal('detailModal')">Close</button>
         </div>
@@ -594,6 +603,48 @@
         <div class="modal-footer-right">
           <button class="btn" onclick="toggleModal('submissionModal')">Cancel</button>
           <button class="btn btn-primary" onclick="saveEntry()">Submit Entry</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- EDIT MODAL FORM -->
+  <div class="modal-overlay" id="editModal">
+    <div class="modal">
+      <div class="modal-header">
+        <h3>Edit Knowledge Base Entry</h3>
+        <button class="close-btn" onclick="toggleModal('editModal')">&times;</button>
+      </div>
+      <div class="modal-body">
+        <input type="hidden" id="editEntryId">
+        <div class="form-group">
+          <label>Entry Type</label>
+          <select class="form-control" id="editEntryType">
+            <option value="drawing">Drawing Breakdown (Visual)</option>
+            <option value="qa">Procurement Q&A / SOP</option>
+          </select>
+        </div>
+        <div class="form-group">
+          <label>Title / Component Description</label>
+          <input type="text" class="form-control" id="editEntryTitle">
+        </div>
+        <div class="form-group">
+          <label>Description / Context</label>
+          <input type="text" class="form-control" id="editEntryDesc">
+        </div>
+        <div class="form-group">
+          <label>Replace Screenshot / Drawing Image (Leave blank to keep existing)</label>
+          <input type="file" class="form-control" id="editEntryImage" accept="image/*">
+        </div>
+        <div class="form-group">
+          <label>Detailed Instructions / Critical Trap</label>
+          <textarea class="form-control" id="editEntryTrap"></textarea>
+        </div>
+      </div>
+      <div class="modal-footer">
+        <div class="modal-footer-right">
+          <button class="btn" onclick="toggleModal('editModal')">Cancel</button>
+          <button class="btn btn-primary" onclick="updateEntry()">Save Changes</button>
         </div>
       </div>
     </div>
@@ -700,6 +751,14 @@
         imgContainer.style.display = 'none';
       }
 
+      // Edit Button Action
+      const editBtn = document.getElementById('detailEditBtn');
+      editBtn.onclick = () => {
+        toggleModal('detailModal');
+        openEditModal(item.id);
+      };
+
+      // Delete Button Action
       const delBtn = document.getElementById('detailDeleteBtn');
       delBtn.onclick = () => {
         deleteEntry(item.id);
@@ -707,6 +766,57 @@
       };
 
       toggleModal('detailModal');
+    }
+
+    function openEditModal(id) {
+      const item = hubData.find(i => i.id === id);
+      if (!item) return;
+
+      document.getElementById('editEntryId').value = item.id;
+      document.getElementById('editEntryType').value = item.type;
+      document.getElementById('editEntryTitle').value = item.title;
+      document.getElementById('editEntryDesc').value = item.desc || '';
+      document.getElementById('editEntryTrap').value = item.trap;
+      document.getElementById('editEntryImage').value = '';
+
+      toggleModal('editModal');
+    }
+
+    function updateEntry() {
+      const id = document.getElementById('editEntryId').value;
+      const type = document.getElementById('editEntryType').value;
+      const title = document.getElementById('editEntryTitle').value;
+      const desc = document.getElementById('editEntryDesc').value;
+      const trap = document.getElementById('editEntryTrap').value;
+      const fileInput = document.getElementById('editEntryImage');
+
+      const index = hubData.findIndex(item => item.id === id);
+      if (index === -1) return;
+
+      if (!title || !trap) {
+        alert('Please fill out at least the Title and Instructions/Trap.');
+        return;
+      }
+
+      hubData[index].type = type;
+      hubData[index].title = title;
+      hubData[index].desc = desc;
+      hubData[index].trap = trap;
+
+      if (fileInput.files && fileInput.files[0]) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+          hubData[index].img = e.target.result;
+          localStorage.setItem('allcon_hub_data', JSON.stringify(hubData));
+          renderCards();
+          toggleModal('editModal');
+        };
+        reader.readAsDataURL(fileInput.files[0]);
+      } else {
+        localStorage.setItem('allcon_hub_data', JSON.stringify(hubData));
+        renderCards();
+        toggleModal('editModal');
+      }
     }
 
     function toggleAdminMode() {
